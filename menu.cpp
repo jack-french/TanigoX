@@ -5,6 +5,8 @@ Menu::Menu(TFT_eSPI *_tft) {
 }
 
 void Menu::drawMainScreen(int highlight) {
+  tft->setTextSize(4);
+  tft->setTextColor(TFT_DARKGREEN, TFT_BLACK);
   if(highlight == 0) {
     tft->fillRect(55, 30, 200, 50, TFT_DARKGREEN);
     tft->setTextColor(TFT_BLACK, TFT_DARKGREEN);

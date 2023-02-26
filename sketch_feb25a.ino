@@ -2,6 +2,8 @@
 #include <SPI.h>
 #include "Menu.hpp"
 
+#define version "Tanigox V0.1"
+
 //Wireing defines
 #define KNOB_PINA 15
 #define KNOB_PINB 14
@@ -65,6 +67,7 @@ void processInputs(Screen currentScreen) {
 //Use this to determine what parameters are needed to be passed for different screens
 void drawScreen(Screen currentScreen) {
   tft.fillScreen(TFT_BLACK);
+  drawVersionInfo();
   switch(currentScreen) {
     case mainScreen:
       menu.drawMainScreen(highlight);
@@ -79,6 +82,12 @@ void drawScreen(Screen currentScreen) {
       menu.drawSettingsScreen();
       break;
   }
+}
+
+void drawVersionInfo() {
+  tft.setTextColor(TFT_DARKGREEN, TFT_BLACK);
+  tft.setTextSize(1);
+  tft.drawString(version, 280, 230);  
 }
 
 void processMainScreen() {
