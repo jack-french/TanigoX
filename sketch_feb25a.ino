@@ -12,14 +12,13 @@
 TFT_eSPI tft = TFT_eSPI();
 Menu menu = Menu(&tft);
 Screen currentScreen;
+bool hasUpdate = true;
 
 //Tracking last inputs
 int knobRotateLTU, knobDownLTU;
+int aVal, oldAVal;
 
-bool hasUpdate = true;
 int highlight = 1;
-int aVal, pinALast;
-boolean bCW;
 
 void setup(void) {
   tft.init();
@@ -87,24 +86,15 @@ void processMainScreen() {
     currentScreen = (Screen) (highlight + 1);
     hasUpdate = true;
   }
-  aVal = digitalRead(KNOB_PINA);
   if (isKnobRotating()) {
-    bCW = digitalRead(KNOB_PINB) != aVal; //check which way rotate
-    if (bCW){
+    if (isKnobRotateCW()) {
       highlight++;
-      if(highlight > 2) {
-        highlight = 0;
-      }
-      hasUpdate = true;
     } else {
       highlight --;
-      if(highlight < 0) {
-        highlight = 2;
-      }
-      hasUpdate = true;
     }
+    forceHightlightInBounds();
+    hasUpdate = true;
   }
-  pinALast = aVal;
 }
 
 void processMessageScreen() {
@@ -116,11 +106,18 @@ void processMessageScreen() {
 
 //Utility Methods
 bool isKnobRotating() {
-  if((digitalRead(KNOB_PINA) != pinALast) && (millis() - knobRotateLTU) > tolerance) {
+  aVal = digitalRead(KNOB_PINA);
+  if((aVal != oldAVal) && (millis() - knobRotateLTU) > tolerance) {
     knobRotateLTU = millis();
-    return true;    
+    oldAVal = aVal;
+    return true;
   }
+  oldAVal = aVal;
   return false;
+}
+
+bool isKnobRotateCW() {
+  return digitalRead(KNOB_PINB) != aVal;
 }
 
 bool isKnobDown() {
@@ -129,6 +126,14 @@ bool isKnobDown() {
     return true;
   }
   return false;
+}
+
+void forceHightlightInBounds() {
+  if(highlight > 2) {
+    highlight = 0;
+  } else if(highlight < 0) {
+    highlight = 2;
+  }
 }
 
 
