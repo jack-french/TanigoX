@@ -2,7 +2,9 @@
 
 class Contact {
 public:
-  const char * name;
+  Contact();
+  Contact(char * name);
+  char * name;
   int uid;
   Message * messagesRecieved;
 };

@@ -28,7 +28,11 @@ void Menu::drawTextEntryScreen(int x, int y) {
   tft->setTextColor(TFT_DARKGREEN, TFT_BLACK);
   for(int j = 0; j < 5; j++) {
     for(int i = 0; i < 8; i++) {
-      tft->drawChar(characters[j][i], 40 * i + 10, 48 * j);
+      if(j == y && i == x) {
+        tft->drawChar(40 * i + 10, 48 * j, characters[j][i], TFT_BLACK, TFT_DARKGREEN, 4);
+      } else {
+        tft->drawChar(characters[j][i], 40 * i + 10, 48 * j);
+      }
     }
   }
 }
@@ -52,6 +56,12 @@ void Menu::drawSettingsScreen(int highlight) {
   drawVerticalList(listValues, 1, highlight);
 }
 
+void Menu::drawContactsList(Contact *contacts) {
+  tft->setTextDatum(MC_DATUM);
+  tft->setTextSize(4);
+  tft->setTextColor(TFT_DARKGREEN, TFT_BLACK);
+  tft->drawString(contacts[0].name, tft->width() / 2, 100);  
+}
 
 void Menu::drawContactsAdd(int x, int y) {
   drawTextEntryScreen(x, y);  

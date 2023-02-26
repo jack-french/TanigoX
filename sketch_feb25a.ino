@@ -22,6 +22,15 @@ int aVal, oldAVal;
 
 int highlight = 1;
 
+//char selection
+bool isColSelection = true;
+int x = 0, y = 0;
+char selectionOutput[128];
+int currentSelectionPos;
+
+//Contacts
+Contact contacts[20];
+
 void setup(void) {
   tft.init();
   tft.setRotation(1);
@@ -64,6 +73,7 @@ void processInputs(Screen currentScreen) {
       processSettingsScreen();
       break;
     case contactsList:
+      processContactsList();
       break;
     case contactsAdd:
       processContactsAdd();
@@ -91,9 +101,10 @@ void drawScreen(Screen currentScreen) {
       menu.drawSettingsScreen(highlight);
       break;
     case contactsList:
+      menu.drawContactsList(contacts);
       break;
     case contactsAdd:
-      menu.drawContactsAdd(0, 0);
+      menu.drawContactsAdd(x, y);
       break;
     case contactsRemove:
       break;
@@ -153,9 +164,44 @@ void processSettingsScreen() {
   checkKnob(0);
 }
 
+void processContactsList() {
+
+}
 
 void processContactsAdd() {
-  
+  if(isKnobDown()) {
+    if(isColSelection) {
+      isColSelection = false;
+    } else {
+      if(y == 4 && x == 7) { //Terminate condition
+        currentScreen = contactsScreen;
+        selectionOutput[currentSelectionPos] = 0;
+        contacts[0] = Contact(&selectionOutput[0]);
+      } else {
+        selectionOutput[currentSelectionPos] = menu.characters[y][x];
+        currentSelectionPos++;
+        isColSelection = true;
+      }
+    }
+    hasUpdate = true;    
+  }
+
+  if (isKnobRotating()) {
+    if (isColSelection) {
+      if(isKnobRotateCW()) {
+        x++;
+      } else {
+        x--;        
+      }
+    } else {
+      if(isKnobRotateCW()) {
+        y++;
+      } else {
+        y--;
+      }
+    }
+    hasUpdate = true;
+  }    
 }
 
 //Utility Methods
