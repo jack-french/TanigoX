@@ -31,7 +31,7 @@ void setup(void) {
   tft.setTextColor(TFT_DARKGREEN, TFT_BLACK);
   tft.setTextDatum(TC_DATUM); 
   tft.drawString("TANIGOX", tft.width() / 2, tft.height() / 2 - tft.fontHeight() / 2);
-  delay(3000);
+  delay(1000);
   tft.setTextSize(4);
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(KNOB_PINA, INPUT);
@@ -58,8 +58,10 @@ void processInputs(Screen currentScreen) {
       processMessageScreen();
       break;
     case contactsScreen:
+      processContactsScreen();
       break;
     case settingsScreen:
+      processSettingsScreen();
       break;
   }
 }
@@ -76,10 +78,10 @@ void drawScreen(Screen currentScreen) {
       menu.drawMessagesScreen();
       break;
     case contactsScreen:
-      menu.drawContactsScreen();
+      menu.drawContactsScreen(highlight);
       break;
     case settingsScreen:
-      menu.drawSettingsScreen();
+      menu.drawSettingsScreen(highlight);
       break;
   }
 }
@@ -93,17 +95,10 @@ void drawVersionInfo() {
 void processMainScreen() {
   if(isKnobDown()) {
     currentScreen = (Screen) (highlight + 1);
+    highlight = 0;
     hasUpdate = true;
   }
-  if (isKnobRotating()) {
-    if (isKnobRotateCW()) {
-      highlight++;
-    } else {
-      highlight --;
-    }
-    forceHightlightInBounds();
-    hasUpdate = true;
-  }
+  checkKnob(2);
 }
 
 void processMessageScreen() {
@@ -113,7 +108,51 @@ void processMessageScreen() {
   }
 }
 
+void processContactsScreen() {
+  if(isKnobDown()) {
+    switch (highlight) {
+      case 0:
+        break;
+      case 1:
+        break;
+      case 2:
+        break;
+      case 3: //Back
+        highlight = 0;
+        currentScreen = mainScreen;
+        break;
+    }
+    hasUpdate = true;
+  }
+  checkKnob(3);
+}
+
+void processSettingsScreen() {
+  if(isKnobDown()) {
+    switch (highlight) {
+      case 0:
+        highlight = 0;
+        currentScreen = mainScreen;
+        break;
+    }
+    hasUpdate = true;
+  }
+  checkKnob(0);
+}
+
 //Utility Methods
+void checkKnob(int max) {
+  if (isKnobRotating()) {
+    if (isKnobRotateCW()) {
+      highlight++;
+    } else {
+      highlight --;
+    }
+    forceHightlightInBounds(max);
+    hasUpdate = true;
+  }  
+}
+
 bool isKnobRotating() {
   aVal = digitalRead(KNOB_PINA);
   if((aVal != oldAVal) && (millis() - knobRotateLTU) > tolerance) {
@@ -137,11 +176,11 @@ bool isKnobDown() {
   return false;
 }
 
-void forceHightlightInBounds() {
-  if(highlight > 2) {
+void forceHightlightInBounds(int max) {
+  if(highlight > max) {
     highlight = 0;
   } else if(highlight < 0) {
-    highlight = 2;
+    highlight = max;
   }
 }
 
