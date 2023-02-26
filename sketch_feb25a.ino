@@ -1,16 +1,25 @@
-/*
-  Ellipse drawing example
-
-  This sketch does not use any fonts.
-*/
 #include <TFT_eSPI.h> // Hardware-specific library
 #include <SPI.h>
-#include "menu.hpp"
+#include "Menu.hpp"
 
-TFT_eSPI tft = TFT_eSPI();       // Invoke custom library
-int KNOB_PINA = 15;
-int KNOB_PINB = 14;
-int KNOB_DOWN = 13;
+//Wireing defines
+#define KNOB_PINA 15
+#define KNOB_PINB 14
+#define KNOB_DOWN 13
+
+#define tolerance 250 //Time between inputs
+
+TFT_eSPI tft = TFT_eSPI();
+Menu menu = Menu(&tft);
+Screen currentScreen;
+
+//Tracking last inputs
+int knobRotateLTU, knobDownLTU;
+
+bool hasUpdate = true;
+int highlight = 1;
+int aVal, pinALast;
+boolean bCW;
 
 void setup(void) {
   tft.init();
@@ -20,54 +29,16 @@ void setup(void) {
   tft.setTextSize(18);
   tft.setTextColor(TFT_DARKGREEN, TFT_BLACK);
   tft.setTextDatum(TC_DATUM); 
-  int xpos = tft.width() / 2; 
-  int ypos = tft.height() / 2;
-  tft.drawString("TANIGOX", xpos, ypos - tft.fontHeight() / 2);
+  tft.drawString("TANIGOX", tft.width() / 2, tft.height() / 2 - tft.fontHeight() / 2);
   delay(3000);
   tft.setTextSize(4);
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(KNOB_PINA, INPUT);
   pinMode(KNOB_PINB, INPUT);
-
 }
 
-tanidraw::Screen currentScreen;
-bool hasUpdate = true;
-int highlight = 1;
-int aVal, pinALast, lastUpdateTime;
-boolean bCW;
-
 void loop() {
-  if(digitalRead(KNOB_DOWN) == LOW) {
-    currentScreen = (tanidraw::Screen) (highlight + 1);
-    hasUpdate = true;
-  }
-  //tft.pushImageDMA(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t *data)
-  aVal = digitalRead(KNOB_PINA);
-  if ((aVal != pinALast) && (millis() - lastUpdateTime) > 250) { // Means the knob is rotating
-    // if the knob is rotating, we need to determine direction
-    // We do that by reading pin B.
-    lastUpdateTime = millis();
-    if (digitalRead(KNOB_PINB) != aVal) { // Means pin A Changed first - We're Rotating Clockwise
-      bCW = true;
-    } else {// Otherwise B changed first and we're moving CCW
-      bCW = false;
-    }
-    if (bCW){
-      highlight++;
-      if(highlight > 2) {
-        highlight = 0;
-      }
-      hasUpdate = true;
-    } else{
-      highlight --;
-      if(highlight < 0) {
-        highlight = 2;
-      }
-      hasUpdate = true;
-    }
-  }
-  pinALast = aVal;
+  processInputs(currentScreen);
 
   //only need to draw the screen if something has changed.
   //other functions should set hasUpdate to true if this is the case.
@@ -77,63 +48,87 @@ void loop() {
   }
 }
 
-void drawScreen(tanidraw::Screen currentScreen) {
+void processInputs(Screen currentScreen) {
+  switch(currentScreen) {
+    case mainScreen:
+      processMainScreen();
+      break;
+    case messagesScreen:
+      processMessageScreen();
+      break;
+    case contactsScreen:
+      break;
+    case settingsScreen:
+      break;
+  }
+}
+
+//Use this to determine what parameters are needed to be passed for different screens
+void drawScreen(Screen currentScreen) {
   tft.fillScreen(TFT_BLACK);
   switch(currentScreen) {
-    case tanidraw::mainScreen:
-      drawMainScreen();
+    case mainScreen:
+      menu.drawMainScreen(highlight);
       break;
-    case tanidraw::messagesScreen:
-      drawMessagesScreen();
+    case messagesScreen:
+      menu.drawMessagesScreen();
       break;
-    case tanidraw::contactsScreen:
-      drawContactsScreen();
+    case contactsScreen:
+      menu.drawContactsScreen();
       break;
-    case tanidraw::settingsScreen:
-      drawSettingsScreen();
+    case settingsScreen:
+      menu.drawSettingsScreen();
       break;
   }
 }
 
-void drawMainScreen() {
-  if(highlight == 0) {
-    tft.fillRect(55, 30, 200, 50, TFT_DARKGREEN);
-    tft.setTextColor(TFT_BLACK, TFT_DARKGREEN);
-    tft.drawString("MESSAGES", tft.width() / 2, 40);  
-    tft.setTextColor(TFT_DARKGREEN, TFT_BLACK);
-  } else {
-    tft.drawString("MESSAGES", tft.width() / 2, 40);  
+void processMainScreen() {
+  if(isKnobDown()) {
+    currentScreen = (Screen) (highlight + 1);
+    hasUpdate = true;
   }
-
-  if(highlight == 1) {
-    tft.fillRect(55, 90, 200, 50, TFT_DARKGREEN);
-    tft.setTextColor(TFT_BLACK, TFT_DARKGREEN);
-    tft.drawString("CONTACTS", tft.width() / 2, 100);
-    tft.setTextColor(TFT_DARKGREEN, TFT_BLACK);
-
-  } else {
-    tft.drawString("CONTACTS", tft.width() / 2, 100);
+  aVal = digitalRead(KNOB_PINA);
+  if (isKnobRotating()) {
+    bCW = digitalRead(KNOB_PINB) != aVal; //check which way rotate
+    if (bCW){
+      highlight++;
+      if(highlight > 2) {
+        highlight = 0;
+      }
+      hasUpdate = true;
+    } else {
+      highlight --;
+      if(highlight < 0) {
+        highlight = 2;
+      }
+      hasUpdate = true;
+    }
   }
+  pinALast = aVal;
+}
 
-  if(highlight == 2) {
-    tft.fillRect(55, 150, 200, 50, TFT_DARKGREEN);
-    tft.setTextColor(TFT_BLACK, TFT_DARKGREEN);
-    tft.drawString("SETTINGS", tft.width() / 2, 160);
-    tft.setTextColor(TFT_DARKGREEN, TFT_BLACK);
-  } else {
-    tft.drawString("SETTINGS", tft.width() / 2, 160);
+void processMessageScreen() {
+  if(isKnobDown()) {
+    currentScreen = mainScreen;
+    hasUpdate = true;
   }
 }
 
-void drawMessagesScreen() {
-  tft.drawString("MESSAGES", tft.width() / 2, 100);
+//Utility Methods
+bool isKnobRotating() {
+  if((digitalRead(KNOB_PINA) != pinALast) && (millis() - knobRotateLTU) > tolerance) {
+    knobRotateLTU = millis();
+    return true;    
+  }
+  return false;
 }
 
-void drawContactsScreen() {
-  tft.drawString("CONTACTS", tft.width() / 2, 100);
+bool isKnobDown() {
+  if((digitalRead(KNOB_DOWN) == LOW) && (millis() - knobDownLTU) > tolerance) {
+    knobDownLTU = millis();
+    return true;
+  }
+  return false;
 }
 
-void drawSettingsScreen() {
-  tft.drawString("SETTINGS", tft.width() / 2, 100);
-}
 
