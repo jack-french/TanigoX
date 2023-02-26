@@ -22,6 +22,17 @@ void Menu::drawVerticalList(const char ** listValues, int num, int highlight) {
   }
 }
 
+void Menu::drawTextEntryScreen(int x, int y) {
+  tft->setTextDatum(MC_DATUM);
+  tft->setTextSize(4);
+  tft->setTextColor(TFT_DARKGREEN, TFT_BLACK);
+  for(int j = 0; j < 5; j++) {
+    for(int i = 0; i < 8; i++) {
+      tft->drawChar(characters[j][i], 40 * i + 10, 48 * j);
+    }
+  }
+}
+
 void Menu::drawMainScreen(int highlight) {
   const char *listValues[] = { "MESSAGES", "CONTACTS", "SETTINGS" };
   drawVerticalList(listValues, 3, highlight);
@@ -39,4 +50,9 @@ void Menu::drawContactsScreen(int highlight) {
 void Menu::drawSettingsScreen(int highlight) {
   const char *listValues[] = { "BACK" };
   drawVerticalList(listValues, 1, highlight);
+}
+
+
+void Menu::drawContactsAdd(int x, int y) {
+  drawTextEntryScreen(x, y);  
 }

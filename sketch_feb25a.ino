@@ -63,6 +63,13 @@ void processInputs(Screen currentScreen) {
     case settingsScreen:
       processSettingsScreen();
       break;
+    case contactsList:
+      break;
+    case contactsAdd:
+      processContactsAdd();
+      break;
+    case contactsRemove:
+      break;
   }
 }
 
@@ -83,14 +90,17 @@ void drawScreen(Screen currentScreen) {
     case settingsScreen:
       menu.drawSettingsScreen(highlight);
       break;
+    case contactsList:
+      break;
+    case contactsAdd:
+      menu.drawContactsAdd(0, 0);
+      break;
+    case contactsRemove:
+      break;
   }
 }
 
-void drawVersionInfo() {
-  tft.setTextColor(TFT_DARKGREEN, TFT_BLACK);
-  tft.setTextSize(1);
-  tft.drawString(version, 280, 230);  
-}
+
 
 void processMainScreen() {
   if(isKnobDown()) {
@@ -112,16 +122,19 @@ void processContactsScreen() {
   if(isKnobDown()) {
     switch (highlight) {
       case 0:
+        currentScreen = contactsList;
         break;
       case 1:
+        currentScreen = contactsAdd;
         break;
       case 2:
+        currentScreen = contactsRemove;
         break;
       case 3: //Back
-        highlight = 0;
         currentScreen = mainScreen;
         break;
     }
+    highlight = 0;
     hasUpdate = true;
   }
   checkKnob(3);
@@ -138,6 +151,11 @@ void processSettingsScreen() {
     hasUpdate = true;
   }
   checkKnob(0);
+}
+
+
+void processContactsAdd() {
+  
 }
 
 //Utility Methods
@@ -184,4 +202,9 @@ void forceHightlightInBounds(int max) {
   }
 }
 
+void drawVersionInfo() {
+  tft.setTextColor(TFT_DARKGREEN, TFT_BLACK);
+  tft.setTextSize(1);
+  tft.drawString(version, 280, 230);  
+}
 
