@@ -1,13 +1,19 @@
 #include <TFT_eSPI.h> // Hardware-specific library
 #include <SPI.h>
 #include "Menu.hpp"
+#include "Radio.hpp"
 
 #define version "Tanigox V0.1"
 
-//Wireing defines
+//Knob Pins
 #define KNOB_PINA 15
 #define KNOB_PINB 14
 #define KNOB_DOWN 13
+
+//Radio Pins
+#define TX 8
+#define RX 9
+#define AUX 7
 
 #define tolerance 250 //Time between inputs
 
@@ -31,6 +37,9 @@ int currentSelectionPos;
 //Contacts
 Contact contacts[20];
 
+//Radio
+Radio radio = Radio();
+
 void setup(void) {
   tft.init();
   tft.setRotation(1);
@@ -45,6 +54,15 @@ void setup(void) {
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(KNOB_PINA, INPUT);
   pinMode(KNOB_PINB, INPUT);
+  
+  
+  pinMode(AUX, INPUT);
+  //pinMode(RX, INPUT);
+  //pinMode(TX, OUTPUT);
+
+  Serial2.setRX(RX);
+  Serial2.setTX(TX);
+  Serial2.begin(9600);
 }
 
 void loop() {
@@ -152,16 +170,23 @@ void processContactsScreen() {
 }
 
 void processSettingsScreen() {
+  digitalWrite(LED_BUILTIN, digitalRead(AUX));
   if(isKnobDown()) {
     switch (highlight) {
-      case 0:
+      case 0: {
+        char dummy[] = "test data send";
+        memcpy(radio.in, &dummy, 14);
+        radio.send(14);
+        break;
+      }
+      case 1:
         highlight = 0;
         currentScreen = mainScreen;
         break;
     }
     hasUpdate = true;
   }
-  checkKnob(0);
+  checkKnob(1);
 }
 
 void processContactsList() {

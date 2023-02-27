@@ -52,8 +52,8 @@ void Menu::drawContactsScreen(int highlight) {
 }
 
 void Menu::drawSettingsScreen(int highlight) {
-  const char *listValues[] = { "BACK" };
-  drawVerticalList(listValues, 1, highlight);
+  const char *listValues[] = { "TEST SEND", "BACK" };
+  drawVerticalList(listValues, 2, highlight);
 }
 
 void Menu::drawContactsList(Contact *contacts) {
