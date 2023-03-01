@@ -2,6 +2,7 @@
 #include <SPI.h>
 #include "Menu.hpp"
 #include "Radio.hpp"
+#include "Message.hpp"
 
 #define version "Tanigox V0.1"
 
@@ -35,12 +36,15 @@ char selectionOutput[128];
 int currentSelectionPos;
 
 //Contacts
-Contact contacts[20];
+Contact myContact = Contact((char*) "Tani1", 1);
+Contact contacts[1] = {Contact((char*) "Tani2", 2)}; //Just for our group a hardcode like this could be a option. I would prefer to have some contact message you can send out though
 
 //Radio
 Radio radio = Radio();
-char recievedMessage[512];
-bool readyToRead = false;
+char recievedContents[512];
+Message recievedMessage = Message();
+
+uint32_t dummy;
 
 void setup(void) {
   tft.init();
@@ -65,6 +69,10 @@ void setup(void) {
 }
 
 void loop() {
+  if(rp2040.fifo.pop_nb(&dummy)) {
+    //handleMessage();
+  }
+
   processInputs(currentScreen);
 
   //only need to draw the screen if something has changed.
@@ -73,6 +81,27 @@ void loop() {
     hasUpdate = false;
     drawScreen(currentScreen);
   }
+}
+
+void setup1() {
+  delay(5000);
+}
+
+void loop1() {
+  PinStatus auxStatus = digitalRead(AUX);
+  if(auxStatus == LOW) {
+    radio.read(recievedContents);
+    recievedMessage = Message(recievedContents);
+    if(recievedMessage.isForMe(myContact.uid)) {
+      rp2040.fifo.push(0);
+    } else {
+      //TODO relay the message
+    }
+    //memcpy(recievedMessage, radio.out, 512);
+    //contacts[0] = Contact(&recievedMessage[0]);
+  } 
+
+  digitalWrite(LED_BUILTIN, auxStatus);
 }
 
 void processInputs(Screen currentScreen) {
@@ -169,20 +198,12 @@ void processContactsScreen() {
 }
 
 void processSettingsScreen() {
-  PinStatus auxStatus = digitalRead(AUX);
-  if(auxStatus == LOW) {
-    radio.read();
-    memcpy(recievedMessage, radio.out, 512);
-    contacts[0] = Contact(&recievedMessage[0]);
-  } 
-
-  digitalWrite(LED_BUILTIN, auxStatus);
   if(isKnobDown()) {
     switch (highlight) {
       case 0: {
         char dummy[] = "uoooh cunny";
-        memcpy(radio.in, &dummy, 11);
-        radio.send(14);
+        //memcpy(radio.in, &dummy, 11);
+        //radio.send(14);
         break;
       }
       case 1:
@@ -207,7 +228,7 @@ void processContactsAdd() {
       if(y == 4 && x == 7) { //Terminate condition
         currentScreen = contactsScreen;
         selectionOutput[currentSelectionPos] = 0;
-        contacts[0] = Contact(&selectionOutput[0]);
+        contacts[0] = Contact(&selectionOutput[0], 0);
       } else {
         selectionOutput[currentSelectionPos] = menu.characters[y][x];
         currentSelectionPos++;

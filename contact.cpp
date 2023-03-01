@@ -4,6 +4,7 @@ Contact::Contact() {
 
 }
 
-Contact::Contact(char * _name) {
+Contact::Contact(char *_name, int _uid) {
   name = _name;
+  uid = _uid;
 }

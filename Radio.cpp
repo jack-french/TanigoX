@@ -4,19 +4,17 @@
 #define AUX 7
 
 Radio::Radio() {
-  in;
-  out;
   hasData = false;
 }
 
-void Radio::send(int numberOfBytes) {
+void Radio::send(char *message, int numberOfBytes) {
   if(digitalRead(AUX) == 1) {
-    Serial2.write(in, numberOfBytes); //should this be 14 or 14 * sizeof(char)?
+    Serial2.write(message, numberOfBytes);
   }
 }
 
-void Radio::read() {
+void Radio::read(char *dest) {
   if (Serial2.available() > 0) {
-    Serial2.readBytes(out, 512);
+    Serial2.readBytes(dest, 512); //other Serial2.read... methods may be better choice
   }
 }

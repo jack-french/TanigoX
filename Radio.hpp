@@ -5,9 +5,7 @@
 class Radio {
 public:
   Radio();
-  char in[512];
-  char out[512];
   bool hasData;
-  void send(int bytes);
-  void read();
+  void send(char *message, int numberOfBytes);
+  void read(char *dest);
 };

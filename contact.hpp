@@ -1,10 +1,12 @@
-#include "Message.hpp"
+#ifndef CONTACT
+#define CONTACT
 
 class Contact {
 public:
   Contact();
-  Contact(char * name);
-  char * name;
+  Contact(char *name, int uid);
+  char *name;
   int uid;
-  Message * messagesRecieved;
 };
+
+#endif
