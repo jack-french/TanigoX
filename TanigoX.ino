@@ -94,15 +94,18 @@ void loop1() {
     radio.read(recievedContents);
     recievedMessage = Message(recievedContents);
     if(recievedMessage.isForMe(myContact.uid)) {
-      rp2040.fifo.push(0);
+      int sender = recievedMessage.getSender();
+      for(Conversation c : conversations) {
+        if(c.getContact().uid == sender) {
+          c.addMessage(recievedMessage);
+          hasUpdate = true;
+          break;
+        }
+      }
     } else {
       //TODO relay the message
     }
-    //memcpy(recievedMessage, radio.out, 512);
-    //contacts[0] = Contact(&recievedMessage[0]);
   } 
-
-  digitalWrite(LED_BUILTIN, auxStatus);
 }
 
 void processInputs(Screen currentScreen) {

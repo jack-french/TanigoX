@@ -24,3 +24,7 @@ Message* Conversation::getMessages() {
 int Conversation::getNumberOfMessages() {
   return numberOfMessages;
 }
+
+Contact Conversation::getContact() {
+  return contact;
+}

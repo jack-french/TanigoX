@@ -10,6 +10,7 @@ public:
   void addMessage(Message message);
   Message* getMessages();
   int getNumberOfMessages();
+  Contact getContact();
 private:
   Contact contact;
   Message messages[32];
