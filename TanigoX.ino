@@ -39,6 +39,8 @@ Contact contacts[20];
 
 //Radio
 Radio radio = Radio();
+char recievedMessage[512];
+bool readyToRead = false;
 
 void setup(void) {
   tft.init();
@@ -57,9 +59,6 @@ void setup(void) {
   
   
   pinMode(AUX, INPUT);
-  //pinMode(RX, INPUT);
-  //pinMode(TX, OUTPUT);
-
   Serial2.setRX(RX);
   Serial2.setTX(TX);
   Serial2.begin(9600);
@@ -170,12 +169,19 @@ void processContactsScreen() {
 }
 
 void processSettingsScreen() {
-  digitalWrite(LED_BUILTIN, digitalRead(AUX));
+  PinStatus auxStatus = digitalRead(AUX);
+  if(auxStatus == LOW) {
+    radio.read();
+    memcpy(recievedMessage, radio.out, 512);
+    contacts[0] = Contact(&recievedMessage[0]);
+  } 
+
+  digitalWrite(LED_BUILTIN, auxStatus);
   if(isKnobDown()) {
     switch (highlight) {
       case 0: {
-        char dummy[] = "test data send";
-        memcpy(radio.in, &dummy, 14);
+        char dummy[] = "uoooh cunny";
+        memcpy(radio.in, &dummy, 11);
         radio.send(14);
         break;
       }

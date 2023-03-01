@@ -9,4 +9,5 @@ public:
   char out[512];
   bool hasData;
   void send(int bytes);
+  void read();
 };

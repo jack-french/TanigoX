@@ -9,12 +9,14 @@ Radio::Radio() {
   hasData = false;
 }
 
-void Radio::send(int bytes) {
+void Radio::send(int numberOfBytes) {
   if(digitalRead(AUX) == 1) {
-    Serial2.write(in, 512); //should this be 14 or 14 * sizeof(char)?
-    Serial2.write(in, 512);
-    Serial2.write(in, 512);
-    Serial2.write(in, 512);
-    Serial2.write(in, 512);
+    Serial2.write(in, numberOfBytes); //should this be 14 or 14 * sizeof(char)?
+  }
+}
+
+void Radio::read() {
+  if (Serial2.available() > 0) {
+    Serial2.readBytes(out, 512);
   }
 }
