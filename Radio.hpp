@@ -1,7 +1,6 @@
 #include <TFT_eSPI.h> // Hardware-specific library
 #include <SPI.h>
 
-
 class Radio {
 public:
   Radio();

@@ -1,3 +1,6 @@
+#ifndef MENU
+#define MENU
+
 #include <TFT_eSPI.h> // Hardware-specific library
 #include <SPI.h>
 #include "contact.hpp"
@@ -30,3 +33,5 @@ private:
   void drawVerticalList(const char ** listValues, int num, int highlight);
   void drawTextEntryScreen(int x, int y);
 };
+
+#endif

@@ -3,6 +3,7 @@
 #include "Menu.hpp"
 #include "Radio.hpp"
 #include "Message.hpp"
+#include "Conversation.hpp"
 
 #define version "Tanigox V0.1"
 
@@ -38,7 +39,7 @@ int currentSelectionPos;
 //Contacts
 Contact myContact = Contact((char*) "Tani1", 1);
 Contact contacts[1] = {Contact((char*) "Tani2", 2)}; //Just for our group a hardcode like this could be a option. I would prefer to have some contact message you can send out though
-
+Conversation conversations[1] = {Conversation(contacts[0])};
 //Radio
 Radio radio = Radio();
 char recievedContents[512];

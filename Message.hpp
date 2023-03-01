@@ -1,3 +1,6 @@
+#ifndef MESSAGE
+#define MESSAGE
+
 #include "Contact.hpp"
 
 class Message {
@@ -14,3 +17,5 @@ private:
   int messageSize;
   Contact recipient;
 };
+
+#endif
