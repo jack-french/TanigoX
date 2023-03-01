@@ -40,6 +40,8 @@ int currentSelectionPos;
 Contact myContact = Contact((char*) "Tani1", 1);
 Contact contacts[1] = {Contact((char*) "Tani2", 2)}; //Just for our group a hardcode like this could be a option. I would prefer to have some contact message you can send out though
 Conversation conversations[1] = {Conversation(contacts[0])};
+int numberOfConversations = 1;
+
 //Radio
 Radio radio = Radio();
 char recievedContents[512];
@@ -88,7 +90,7 @@ void setup1() {
   delay(5000);
 }
 
-void loop1() {
+void loop1() { //Second core is in charge of recieving any messages
   PinStatus auxStatus = digitalRead(AUX);
   if(auxStatus == LOW) {
     radio.read(recievedContents);
@@ -142,7 +144,7 @@ void drawScreen(Screen currentScreen) {
       menu.drawMainScreen(highlight);
       break;
     case messagesScreen:
-      menu.drawMessagesScreen();
+      menu.drawMessagesScreen(highlight, numberOfConversations, conversations);
       break;
     case contactsScreen:
       menu.drawContactsScreen(highlight);

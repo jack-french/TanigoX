@@ -42,8 +42,12 @@ void Menu::drawMainScreen(int highlight) {
   drawVerticalList(listValues, 3, highlight);
 }
 
-void Menu::drawMessagesScreen() {
-  tft->drawString("MESSAGES", tft->width() / 2, 100);
+void Menu::drawMessagesScreen(int highlight, int numberOfConversations, Conversation *conversations) {
+  char *conversationNames[numberOfConversations];
+  for(int i = 0; i < numberOfConversations; i++) {
+    conversationNames[i] = conversations[i].getContact().name;
+  }
+  drawVerticalList((const char**) conversationNames, numberOfConversations, highlight);
 }
 
 void Menu::drawContactsScreen(int highlight) {

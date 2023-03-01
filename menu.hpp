@@ -4,6 +4,7 @@
 #include <TFT_eSPI.h> // Hardware-specific library
 #include <SPI.h>
 #include "contact.hpp"
+#include "Conversation.hpp"
 
 enum Screen {
   mainScreen, messagesScreen, contactsScreen, settingsScreen,
@@ -14,7 +15,7 @@ class Menu {
 public:
   Menu(TFT_eSPI *tft);
   void drawMainScreen(int highlight);
-  void drawMessagesScreen();
+  void drawMessagesScreen(int highlight, int numberOfConversations, Conversation *conversations);
   void drawContactsScreen(int highlight);
   void drawSettingsScreen(int highlight);
 
