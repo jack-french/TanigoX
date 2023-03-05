@@ -51,22 +51,18 @@ void Menu::drawMessagesScreen(int highlight, int numberOfConversations, Conversa
 }
 
 void Menu::drawConversationScreen(Conversation conversation) {
-  Serial.print("Drawing Conversation");
   int numberOfMessages = conversation.getNumberOfMessages();
-  Serial.print(numberOfMessages);
-  Serial.print(conversation.getMessage(0).getTotalSizeOfMessage());
-  Serial.print(conversation.getMessage(0).getContents());
-  //char* messageTexts = new char[numberOfMessages][256];
   char **messageTexts = new char*[numberOfMessages];
-  Serial.print("initalized");
   for(int i = 0; i < numberOfMessages; i++) {
-    Serial.print("Got to loop");
     messageTexts[i] = new char[conversation.getMessage(i).getSizeOfMessage()];
     memcpy(messageTexts[i], conversation.getMessage(i).getContents(), conversation.getMessage(i).getSizeOfMessage());
   }
-  Serial.print("Got to draw");
   drawVerticalList((const char**) messageTexts, numberOfMessages, 0);
-  delete messageTexts;
+
+  for(int i = 0; i < numberOfMessages; i++) {
+    delete[] messageTexts[i];
+  }
+  delete[] messageTexts;
 }
 
 void Menu::drawContactsScreen(int highlight) {

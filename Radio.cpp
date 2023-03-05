@@ -20,7 +20,7 @@ void Radio::read(char *dest) {
   int numBytesRead = 0;
   while(digitalRead(AUX) != HIGH) {
     if (Serial2.available() > 0) {
-      numBytesRead += Serial2.readBytes(dest + numBytesRead, numberToRead - numBytesRead); //other Serial2.read... methods may be better choice
+      numBytesRead += Serial2.readBytes(dest + numBytesRead, numberToRead - numBytesRead);
       if(numBytesRead == 3) {
         numberToRead += dest[2];
       }

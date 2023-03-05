@@ -37,11 +37,11 @@ char selectionOutput[128];
 int currentSelectionPos;
 
 // Contacts
-// Contact myContact = Contact((char*) "Tani1", 1); //TANI1 CODE
-// Contact contacts[1] = {Contact((char*) "Tani2", 2)}; //Just for our group a hardcode like this could be a option. I would prefer to have some contact message you can send out though
+Contact myContact = Contact((char*) "Tani1", 1); //TANI1 CODE
+Contact contacts[1] = {Contact((char*) "Tani2", 2)}; //Just for our group a hardcode like this could be a option. I would prefer to have some contact message you can send out though
 
-Contact myContact = Contact((char*) "Tani2", 2);
-Contact contacts[1] = {Contact((char*) "Tani1", 1)}; //Just for our group a hardcode like this could be a option. I would prefer to have some contact message you can send out though
+// Contact myContact = Contact((char*) "Tani2", 2);
+// Contact contacts[1] = {Contact((char*) "Tani1", 1)}; //Just for our group a hardcode like this could be a option. I would prefer to have some contact message you can send out though
 
 Conversation conversations[1] = {Conversation(contacts[0])};
 int numberOfConversations = 1;
@@ -51,8 +51,6 @@ Conversation selectedConversation = Conversation();
 Radio radio = Radio();
 char recievedContents[512];
 Message recievedMessage = Message();
-
-uint32_t dummy;
 
 void setup(void) {
   tft.init();
@@ -98,19 +96,7 @@ void loop1() { //Second core is in charge of recieving any messages
   PinStatus auxStatus = digitalRead(AUX);
   if(auxStatus == LOW) {
     radio.read(recievedContents);
-    // Serial.print("Raw Contents\n");
-    // Serial.print(recievedContents);
-    // Serial.print("End of raw contents");
     recievedMessage = Message(recievedContents);
-    Serial.print("Contents\n");
-    Serial.print(recievedMessage.getContents());
-    Serial.print("\nRecipient\n");
-    Serial.print(recievedMessage.getRecipient());
-    Serial.print("\nSender\n");
-    Serial.print(recievedMessage.getSender());
-    Serial.print("\nLength\n");
-    Serial.print(recievedMessage.getSizeOfMessage());
-    Serial.print("\nEnd of message\n");
 
     if(recievedMessage.isForMe(myContact.uid)) {
       int sender = recievedMessage.getSender();
