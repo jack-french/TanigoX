@@ -36,11 +36,16 @@ int x = 0, y = 0;
 char selectionOutput[128];
 int currentSelectionPos;
 
-//Contacts
-Contact myContact = Contact((char*) "Tani1", 1);
-Contact contacts[1] = {Contact((char*) "Tani2", 2)}; //Just for our group a hardcode like this could be a option. I would prefer to have some contact message you can send out though
+// Contacts
+// Contact myContact = Contact((char*) "Tani1", 1); //TANI1 CODE
+// Contact contacts[1] = {Contact((char*) "Tani2", 2)}; //Just for our group a hardcode like this could be a option. I would prefer to have some contact message you can send out though
+
+Contact myContact = Contact((char*) "Tani2", 2);
+Contact contacts[1] = {Contact((char*) "Tani1", 1)}; //Just for our group a hardcode like this could be a option. I would prefer to have some contact message you can send out though
+
 Conversation conversations[1] = {Conversation(contacts[0])};
 int numberOfConversations = 1;
+Conversation selectedConversation = Conversation();
 
 //Radio
 Radio radio = Radio();
@@ -69,18 +74,17 @@ void setup(void) {
   Serial2.setRX(RX);
   Serial2.setTX(TX);
   Serial2.begin(9600);
+
+  Serial.begin(9600);
 }
 
 void loop() {
-  if(rp2040.fifo.pop_nb(&dummy)) {
-    //handleMessage();
-  }
-
   processInputs(currentScreen);
 
   //only need to draw the screen if something has changed.
   //other functions should set hasUpdate to true if this is the case.
   if(hasUpdate) {
+    Serial.print("Working on loop 1");
     hasUpdate = false;
     drawScreen(currentScreen);
   }
@@ -94,12 +98,26 @@ void loop1() { //Second core is in charge of recieving any messages
   PinStatus auxStatus = digitalRead(AUX);
   if(auxStatus == LOW) {
     radio.read(recievedContents);
+    // Serial.print("Raw Contents\n");
+    // Serial.print(recievedContents);
+    // Serial.print("End of raw contents");
     recievedMessage = Message(recievedContents);
+    Serial.print("Contents\n");
+    Serial.print(recievedMessage.getContents());
+    Serial.print("\nRecipient\n");
+    Serial.print(recievedMessage.getRecipient());
+    Serial.print("\nSender\n");
+    Serial.print(recievedMessage.getSender());
+    Serial.print("\nLength\n");
+    Serial.print(recievedMessage.getSizeOfMessage());
+    Serial.print("\nEnd of message\n");
+
     if(recievedMessage.isForMe(myContact.uid)) {
       int sender = recievedMessage.getSender();
-      for(Conversation c : conversations) {
-        if(c.getContact().uid == sender) {
-          c.addMessage(recievedMessage);
+      for(int i = 0; i < numberOfConversations; i++) {
+        if(conversations[i].getContact().uid == sender) {
+          digitalWriteFast(LED_BUILTIN, HIGH);
+          conversations[i].addMessage(recievedMessage);
           hasUpdate = true;
           break;
         }
@@ -117,6 +135,9 @@ void processInputs(Screen currentScreen) {
       break;
     case messagesScreen:
       processMessageScreen();
+      break;
+    case conversationScreen:
+      processConversationScreen();
       break;
     case contactsScreen:
       processContactsScreen();
@@ -145,6 +166,9 @@ void drawScreen(Screen currentScreen) {
       break;
     case messagesScreen:
       menu.drawMessagesScreen(highlight, numberOfConversations, conversations);
+      break;
+    case conversationScreen:
+      menu.drawConversationScreen(selectedConversation);
       break;
     case contactsScreen:
       menu.drawContactsScreen(highlight);
@@ -176,9 +200,15 @@ void processMainScreen() {
 
 void processMessageScreen() {
   if(isKnobDown()) {
-    currentScreen = mainScreen;
+    currentScreen = conversationScreen;
+    selectedConversation = conversations[highlight];
     hasUpdate = true;
   }
+  checkKnob(numberOfConversations);
+}
+
+void processConversationScreen() {
+
 }
 
 void processContactsScreen() {
@@ -208,8 +238,8 @@ void processSettingsScreen() {
     switch (highlight) {
       case 0: {
         char dummy[] = "uoooh cunny";
-        //memcpy(radio.in, &dummy, 11);
-        //radio.send(14);
+        Message dummyMessage = Message(dummy, 12, contacts[0], myContact);
+        radio.send(dummyMessage);
         break;
       }
       case 1:

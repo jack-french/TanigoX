@@ -7,8 +7,8 @@
 #include "Conversation.hpp"
 
 enum Screen {
-  mainScreen, messagesScreen, contactsScreen, settingsScreen,
-  contactsList, contactsAdd, contactsRemove
+  mainScreen, messagesScreen, contactsScreen, settingsScreen, //must be first 4 to allow efficient selection main menu
+  conversationScreen, contactsList, contactsAdd, contactsRemove
 };
 
 class Menu {
@@ -16,6 +16,8 @@ public:
   Menu(TFT_eSPI *tft);
   void drawMainScreen(int highlight);
   void drawMessagesScreen(int highlight, int numberOfConversations, Conversation *conversations);
+  void drawConversationScreen(Conversation conversation);
+
   void drawContactsScreen(int highlight);
   void drawSettingsScreen(int highlight);
 

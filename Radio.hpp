@@ -1,10 +1,11 @@
 #include <TFT_eSPI.h> // Hardware-specific library
 #include <SPI.h>
+#include "Message.hpp"
 
 class Radio {
 public:
   Radio();
   bool hasData;
-  void send(char *message, int numberOfBytes);
+  void send(Message message);
   void read(char *dest);
 };

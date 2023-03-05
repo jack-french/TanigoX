@@ -6,9 +6,11 @@
 
 class Conversation {
 public:
+  Conversation();
   Conversation(Contact contact);
   void addMessage(Message message);
   Message* getMessages();
+  Message getMessage(int i);
   int getNumberOfMessages();
   Contact getContact();
 private:

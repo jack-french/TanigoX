@@ -7,14 +7,23 @@ Radio::Radio() {
   hasData = false;
 }
 
-void Radio::send(char *message, int numberOfBytes) {
+void Radio::send(Message message) {
   if(digitalRead(AUX) == 1) {
-    Serial2.write(message, numberOfBytes);
+    char sendable[message.getTotalSizeOfMessage()];
+    message.writeSendableMessage(sendable);
+    Serial2.write(sendable, message.getTotalSizeOfMessage());
   }
 }
 
 void Radio::read(char *dest) {
-  if (Serial2.available() > 0) {
-    Serial2.readBytes(dest, 512); //other Serial2.read... methods may be better choice
+  int numberToRead = 3; //To find the actual number
+  int numBytesRead = 0;
+  while(digitalRead(AUX) != HIGH) {
+    if (Serial2.available() > 0) {
+      numBytesRead += Serial2.readBytes(dest + numBytesRead, numberToRead - numBytesRead); //other Serial2.read... methods may be better choice
+      if(numBytesRead == 3) {
+        numberToRead += dest[2];
+      }
+    }
   }
 }

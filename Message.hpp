@@ -8,13 +8,16 @@ public:
   Message();
   Message(char *message, int messageSize, Contact recipient, Contact sender);
   Message(char *rawMessage);
+  Message(const Message& m);
   char *getContents();
   int getRecipient();
   int getSender();
   void writeSendableMessage(char *dest);
+  int getTotalSizeOfMessage();
+  int getSizeOfMessage();
   bool isForMe(int uid);
 private:
-  char *message;
+  char* messageContents;
   int messageSize;
   int recipient, sender;
 };
